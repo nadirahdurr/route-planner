@@ -1,0 +1,160 @@
+{
+  "metadata": {
+    "origin": {
+      "lat": 34.0,
+      "lon": -117.0
+    },
+    "cell_size_m": 100,
+    "ttl_hours": 720,
+    "last_updated": "2025-10-20T00:00:00Z"
+  },
+  "classes": {
+    "trail": {
+      "cost_factor": 0.8,
+      "exposure": 0.2,
+      "speed_modifier": 1.1
+    },
+    "forest": {
+      "cost_factor": 1.2,
+      "exposure": 0.4,
+      "speed_modifier": 0.85
+    },
+    "open": {
+      "cost_factor": 1.0,
+      "exposure": 0.6,
+      "speed_modifier": 1.0
+    },
+    "wetland": {
+      "cost_factor": 1.5,
+      "exposure": 0.5,
+      "speed_modifier": 0.7
+    },
+    "road": {
+      "cost_factor": 0.7,
+      "exposure": 0.3,
+      "speed_modifier": 1.2
+    }
+  },
+  "grid": [
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "road",
+      "road",
+      "road"
+    ],
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "road",
+      "road",
+      "road"
+    ],
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "road",
+      "road",
+      "road"
+    ],
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "open",
+      "open",
+      "road"
+    ],
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "wetland",
+      "wetland",
+      "open",
+      "open"
+    ],
+    [
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "wetland",
+      "wetland",
+      "open",
+      "open"
+    ],
+    [
+      "forest",
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "wetland",
+      "open",
+      "open",
+      "open"
+    ],
+    [
+      "forest",
+      "forest",
+      "forest",
+      "forest",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "open",
+      "open"
+    ],
+    [
+      "forest",
+      "forest",
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "open"
+    ],
+    [
+      "forest",
+      "forest",
+      "forest",
+      "forest",
+      "trail",
+      "trail",
+      "open",
+      "open",
+      "open",
+      "open"
+    ]
+  ]
+}
