@@ -261,7 +261,7 @@ mcp = FastMCP("route-planner-mcp")
 ENGINE = RoutePlannerEngine()
 
 
-@mcp.tool()
+@mcp.tool(name="nav.route")
 def nav_route(
     start: List[float],
     end: List[float],
@@ -271,13 +271,13 @@ def nav_route(
     return ENGINE.nav_route({"start": start, "end": end, "max_candidates": max_candidates})
 
 
-@mcp.tool()
+@mcp.tool(name="nav.risk_eval")
 def nav_risk_eval(route_ids: Optional[List[str]] = None) -> Dict[str, Any]:
     """Evaluate routes for slope, exposure, and hydrology risk with explicit weighting."""
     return ENGINE.nav_risk_eval({"route_ids": route_ids})
 
 
-@mcp.tool()
+@mcp.tool(name="nav.pace_estimator")
 def nav_pace_estimator(
     mode: str = "foot",
     load_kg: float = 25.0,
@@ -289,7 +289,7 @@ def nav_pace_estimator(
     )
 
 
-@mcp.tool()
+@mcp.tool(name="nav.select")
 def nav_select(
     route_ids: Optional[List[str]] = None,
     must_arrive_before: Optional[str] = None,
@@ -309,7 +309,7 @@ def nav_select(
     )
 
 
-@mcp.tool()
+@mcp.tool(name="nav.export")
 def nav_export(basename: Optional[str] = None) -> Dict[str, Any]:
     """Export the selected route to GeoJSON/GPX and generate a Markdown mission brief.
 
@@ -327,6 +327,11 @@ def nav_brief_prompt() -> str:
 
 def main() -> None:
     mcp.run(transport="stdio")
+
+
+def run() -> None:
+    """Entry point used by `mcp run route_planner_mcp/server.py`."""
+    main()
 
 
 if __name__ == "__main__":

@@ -23,6 +23,20 @@ exports/             # Created at runtime for GPX/GeoJSON/brief outputs
 route_planner_mcp/   # Application package (tools, MCP server, CLI)
 ```
 
+## Architecture Overview
+
+```mermaid
+flowchart TD
+    Client[CLI / MCP host / route-planner-tool] -->|JSON-RPC (stdin/stdout)| Server[FastMCP server<br/>route_planner_mcp.server]
+    Server -->|Loads fixtures| Data[(Local DEM<br/>landcover<br/>roads<br/>obstacles)]
+    Server -->|A* search + terrain metrics| Pathfinding[Route generation<br/>profiles: balanced / trail_pref / low_exposure]
+    Server --> Risk[Risk engine<br/>slope / exposure / hydrology]
+    Server --> Pace[Pace estimator<br/>Naismith + load/mode]
+    Server --> Selection[Selection policy<br/>constraints / policy id]
+    Selection --> Exports[Exporter<br/>GeoJSON / GPX / brief<br/>SHA-256 checksums]
+    Exports --> Files[exports/ directory]
+```
+
 ## Getting Started
 
 ### 1. Install dependencies
@@ -48,18 +62,51 @@ The server is implemented with FastMCP and automatically exposes MCP tool metada
 - `nav.export`
 - `@nav/brief` (prompt metadata via `list_prompts`)
 
-Example request/response (single line JSON payloads):
+### 3. Call an individual tool (no manual JSON required)
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "nav.route",
-  "params": { "start": [34.001, -116.999], "end": [34.008, -116.992] }
-}
+Use the helper CLI to handle the JSON-RPC handshake automatically (no need to start the server yourself):
+
+```bash
+route-planner-tool nav.route --args '{"start":[34.001,-116.999],"end":[34.008,-116.992],"max_candidates":3}'
 ```
 
-### 3. Use the planner CLI
+Swap `nav.route` for any other tool (e.g. `nav.risk_eval`, `nav.export`) and adjust `--args` to match the required parameters.
+
+Call other tools the same way:
+
+```bash
+# Evaluate risk for specific routes (IDs returned by nav.route)
+route-planner-tool nav.risk_eval --args '{"route_ids":["route-1","route-2"]}'
+
+# Estimate pace for cached routes (omit route_ids to use all)
+route-planner-tool nav.pace_estimator --args '{"mode":"foot","load_kg":20,"route_ids":["route-1","route-2"]}'
+
+# Select the preferred route under commander constraints
+route-planner-tool nav.select --args '{
+  "route_ids":["route-1","route-2"],
+  "prefer_low_risk": true,
+  "avoid_slope_degrees": 12,
+  "max_distance_m": 1500
+}'
+
+# Export the chosen route bundle (call nav.select first)
+route-planner-tool nav.export --args '{"basename":"mission-blue"}'
+```
+
+> Tip: Do **not** run `route-planner-mcp-server` in the same terminal while using `route-planner-tool`. The helper spawns and shuts down the FastMCP server behind the scenes for each call.
+
+### Alternative: Launch via MCP CLI
+
+If you prefer to run through the `mcp` helper (which takes care of the JSON-RPC handshake), use:
+
+```bash
+source env/bin/activate
+mcp run route-planner-mcp-server.py
+```
+
+That adapter script simply calls the same FastMCP app, so the JSON responses are identical.
+
+### 4. Use the planner CLI
 
 The CLI orchestrates `route → risk → pace → select → export`.
 

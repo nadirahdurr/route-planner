@@ -23,6 +23,7 @@ dev = [
 [project.scripts]
 route-planner-cli = "route_planner_mcp.cli:main"
 route-planner-mcp-server = "route_planner_mcp.server:main"
+route-planner-tool = "route_planner_mcp.tool_runner:main"
 
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
