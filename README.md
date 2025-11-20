@@ -5,6 +5,10 @@ Offline mission route planning service, this application exposes MCP-style tools
 ## Features
 
 - Generates 1–3 candidate routes between two coordinates using local DEM, landcover, road, and obstacle fixtures.
+- Dynamically reloads terrain data when switching between uploaded terrain bundles.
+- Supports two routing modes: A\* pathfinding on terrain grids (full DEM/landcover) and Dijkstra's algorithm on road networks (OSM-only data).
+- Automatically detects OSM-only terrain bundles and switches to road network routing.
+- Identifies largest connected road components to ensure viable paths in disconnected graphs.
 - Scores each route for slope, exposure, and hydrology factors.
 - Provides transparent risk weights/components so commanders can recompute aggregates.
 - Reports terrain coverage, hydrology checks, and per-route uncertainty for auditability.
@@ -30,8 +34,8 @@ packages/
 ```mermaid
 flowchart TD
     Client[CLI / MCP host / route-planner-tool] -->|JSON-RPC (stdin/stdout)| Server[FastMCP server<br/>route_planner_mcp.server]
-    Server -->|Loads fixtures| Data[(Local DEM<br/>landcover<br/>roads<br/>obstacles)]
-    Server -->|A* search + terrain metrics| Pathfinding[Route generation<br/>profiles: balanced / trail_pref / low_exposure]
+    Server -->|Dynamic terrain reload| Data[(Local DEM<br/>landcover<br/>roads<br/>obstacles)]
+    Server -->|A* (terrain grid) or<br/>Dijkstra (road network)| Pathfinding[Route generation<br/>profiles: balanced / trail_pref / low_exposure]
     Server --> Risk[Risk engine<br/>slope / exposure / hydrology]
     Server --> Pace[Pace estimator<br/>Naismith + load/mode]
     Server --> Selection[Selection policy<br/>constraints / policy id]
@@ -158,13 +162,23 @@ Environment variables (via `.env` or shell) control storage locations:
 
 ## Web UI (Next.js scaffold)
 
-A Next.js App Router project lives in `apps/web`. It currently renders a MapLibre canvas and placeholder panels while the agent integration is built out.
+A Next.js App Router project lives in `apps/web`. It renders a dark-themed MapLibre canvas with CartoDB Dark Matter base tiles and interactive route visualization.
 
 ```bash
 pnpm install
 NEXT_PUBLIC_AGENT_URL=http://localhost:8000 pnpm dev:web
 # open http://localhost:3000
 ```
+
+The UI features:
+
+- Dark mode map with CartoDB Dark Matter tiles and custom label styling
+- Real-time route visualization with color-coded paths (primary route in green, alternatives in blue)
+- Interactive form for terrain selection, coordinates, and routing preferences
+- Route analysis table showing distance, cost, and terrain coverage
+- LLM-generated mission assessment and recommendations
+- Progress indicators for terrain upload and route planning
+- Support for uploading OSM PBF files with real-time conversion progress
 
 The UI depends on the FastAPI agent service (under `apps/agent`) for terrain bundle ingestion and MCP orchestration.
 
@@ -184,7 +198,9 @@ The UI supports uploading terrain bundles in multiple formats:
 
 - Upload OSM PBF files directly from [Geofabrik](https://download.geofabrik.de/)
 - System automatically extracts roads and obstacles using pyosmium
-- DEM and land cover are created as placeholders (limited terrain analysis)
+- DEM and land cover are created as placeholders (10x10 grid)
+- Routes are computed using Dijkstra's algorithm on the road network graph
+- System identifies the largest connected component to ensure viable paths
 - No additional system dependencies required
 
 **Option 3: Use Demo Data**
