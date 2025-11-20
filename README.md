@@ -1,4 +1,4 @@
-# Route Planner MCP
+# Route Planner App
 
 Offline mission route planning service, this application exposes MCP-style tools, resources, and prompt metadata so agents can plan, score, and export mission routes without network access.
 
