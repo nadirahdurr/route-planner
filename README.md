@@ -33,14 +33,14 @@ packages/
 
 ```mermaid
 flowchart TD
-    Client[CLI / MCP host / route-planner-tool] -->|JSON-RPC (stdin/stdout)| Server[FastMCP server<br/>route_planner_mcp.server]
-    Server -->|Dynamic terrain reload| Data[(Local DEM<br/>landcover<br/>roads<br/>obstacles)]
-    Server -->|A* (terrain grid) or<br/>Dijkstra (road network)| Pathfinding[Route generation<br/>profiles: balanced / trail_pref / low_exposure]
-    Server --> Risk[Risk engine<br/>slope / exposure / hydrology]
-    Server --> Pace[Pace estimator<br/>Naismith + load/mode]
-    Server --> Selection[Selection policy<br/>constraints / policy id]
-    Selection --> Exports[Exporter<br/>GeoJSON / GPX / brief<br/>SHA-256 checksums]
-    Exports --> Files[exports/ directory]
+    Client["CLI / MCP host / route-planner-tool"] -->|"JSON-RPC (stdin/stdout)"| Server["FastMCP server: route_planner_mcp.server"]
+    Server -->|"Dynamic terrain reload"| Data[("Local DEM, landcover, roads, obstacles")]
+    Server -->|"A* or Dijkstra"| Pathfinding["Route generation: balanced / trail_pref / low_exposure"]
+    Server --> Risk["Risk engine: slope / exposure / hydrology"]
+    Server --> Pace["Pace estimator: Naismith + load/mode"]
+    Server --> Selection["Selection policy: constraints / policy id"]
+    Selection --> Exports["Exporter: GeoJSON / GPX / brief + SHA-256"]
+    Exports --> Files["exports/ directory"]
 ```
 
 ## Getting Started
