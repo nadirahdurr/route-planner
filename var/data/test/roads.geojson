@@ -1,0 +1,36 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "main-supply"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-117.0, 34.0],
+          [-116.9985, 34.002],
+          [-116.997, 34.0045],
+          [-116.9955, 34.006],
+          [-116.994, 34.008]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ridge-track"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-117.001, 34.001],
+          [-116.999, 34.003],
+          [-116.9975, 34.005],
+          [-116.996, 34.0075]
+        ]
+      }
+    }
+  ]
+}

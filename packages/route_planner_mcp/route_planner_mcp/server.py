@@ -118,6 +118,16 @@ class RoutePlannerEngine:
         self.state = RoutePlannerState()
         self._route_counter = 0
 
+    def reload_terrain(self, terrain_dir: str) -> None:
+        """Reload terrain data from a specific directory (e.g., uploaded terrain bundle)."""
+        from pathlib import Path
+        base_path = Path(terrain_dir)
+        self.dem = load_dem(base_path / "dem.json")
+        self.landcover = load_landcover(base_path / "landcover.json")
+        self.obstacles = load_obstacles(base_path / "obstacles.geojson")
+        self.roads = load_roads(base_path / "roads.geojson")
+        self.obstacle_polys = obstacle_polygons(self.obstacles)
+
     def nav_route(self, params: Dict[str, Any]) -> Dict[str, Any]:
         start = tuple(params["start"])  # type: ignore[arg-type]
         end = tuple(params["end"])  # type: ignore[arg-type]

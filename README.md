@@ -18,9 +18,11 @@ Offline mission route planning service, this application exposes MCP-style tools
 ## Project Layout
 
 ```
-data/                # Local raster/vector fixtures (DEM, landcover, roads, obstacles)
-exports/             # Created at runtime for GPX/GeoJSON/brief outputs
-route_planner_mcp/   # Application package (tools, MCP server, CLI)
+apps/
+  agent/             # FastAPI + LangGraph orchestration service for terrain bundles
+  web/               # Next.js frontend with MapLibre visualization
+packages/
+  route_planner_mcp/ # Offline route planner MCP package (tools, CLI, data fixtures)
 ```
 
 ## Architecture Overview
@@ -44,7 +46,9 @@ flowchart TD
 ```bash
 python -m venv env
 source env/bin/activate
-pip install -e .
+pip install -e packages/route_planner_mcp
+# Agent service development (optional, but recommended for the LangGraph API)
+pip install -e apps/agent
 ```
 
 ### 2. Run the MCP server
@@ -125,6 +129,78 @@ Responses also carry a `schema` fingerprint, EPSG:4326 CRS metadata, and an expl
 
 Call `nav.export` directly (or supply `--export-name`) to choose the basename for generated `*.geojson`, `*.gpx`, and brief files; defaults to the selected route id.
 
+## Agent API (FastAPI + LangGraph)
+
+The orchestration service lives in `apps/agent`. It currently wires a terrain loader and the MCP engine into a LangGraph state machine.
+
+```bash
+source env/bin/activate
+uvicorn agent_app.main:app --app-dir apps/agent/src --reload
+# API available at http://localhost:8000/docs
+```
+
+> The agent uses an Ollama-served model for mission reasoning. Make sure the Ollama daemon
+> is running and the model is available, for example:
+>
+> ```bash
+> ollama run llama3.1:8b  # downloads on first execution
+> ```
+>
+> Override defaults with `ROUTE_AGENT_OLLAMA_MODEL` and `ROUTE_AGENT_OLLAMA_BASE_URL`.
+
+Environment variables (via `.env` or shell) control storage locations:
+
+- `ROUTE_AGENT_DATA_ROOT` – directory that stores uploaded terrain bundles (default `var/data`)
+- `ROUTE_AGENT_EXPORT_ROOT` – directory for generated exports (default `var/exports`)
+- `ROUTE_AGENT_OLLAMA_BASE_URL` – Ollama server URL (default `http://localhost:11434`)
+- `ROUTE_AGENT_OLLAMA_MODEL` – model identifier used for decisions (default `llama3.1:8b`)
+- `ROUTE_AGENT_CORS_ALLOW_ORIGINS` – JSON array or comma-separated origins allowed for CORS (defaults to `http://localhost:3000` and `http://127.0.0.1:3000`)
+
+## Web UI (Next.js scaffold)
+
+A Next.js App Router project lives in `apps/web`. It currently renders a MapLibre canvas and placeholder panels while the agent integration is built out.
+
+```bash
+pnpm install
+NEXT_PUBLIC_AGENT_URL=http://localhost:8000 pnpm dev:web
+# open http://localhost:3000
+```
+
+The UI depends on the FastAPI agent service (under `apps/agent`) for terrain bundle ingestion and MCP orchestration.
+
+### Uploading Terrain Data
+
+The UI supports uploading terrain bundles in multiple formats:
+
+**Option 1: Complete Terrain Bundle (.zip)**
+
+- Package containing all 4 required files:
+  - `dem.json` (elevation data)
+  - `landcover.json` (terrain classification)
+  - `roads.geojson` (road network)
+  - `obstacles.geojson` (hazards/obstacles)
+
+**Option 2: OpenStreetMap Data (.osm.pbf)**
+
+- Upload OSM PBF files directly from [Geofabrik](https://download.geofabrik.de/)
+- System automatically extracts roads and obstacles using pyosmium
+- DEM and land cover are created as placeholders (limited terrain analysis)
+- No additional system dependencies required
+
+**Option 3: Use Demo Data**
+
+- Demo terrain bundles are available in `var/data/` after setup
+
+## Docker Compose
+
+Bring up the agent API and web UI together:
+
+```bash
+docker compose up --build
+```
+
+The agent listens on `http://localhost:8000`, and the web UI is served at `http://localhost:3000`. The containerised web app targets the agent service via the Docker network (`http://agent:8000`).
+
 ## Prompt Metadata
 
 `@nav/brief` is exposed via `list_prompts`. Agents can request the template to compose Markdown mission briefs summarizing checkpoints, timing, and risk caveats.
@@ -135,8 +211,11 @@ Each tool response exposes dataset freshness. DEM and landcover expire after 30 
 
 ## Development
 
-- Run `pytest` (when tests are added) with `pip install .[dev]`.
-- Lint via `ruff`/`black` or preferred tooling (not bundled).
-- Update fixtures in `data/` to reflect new AOIs or intelligence; keep metadata timestamps current to pass TTL checks.
+- **Lint & format (Python):**
+  - `ruff check packages/route_planner_mcp apps/agent/src`
+  - `black packages/route_planner_mcp apps/agent/src`
+- **Lint (web):** `pnpm lint:web`
+- **Run tests:** `pytest` (tests to be added)
+- Update fixtures in `packages/route_planner_mcp/data/` to reflect new AOIs or intelligence; keep metadata timestamps current to pass TTL checks.
 
 [^fastmcp]: Based on the “Build an MCP server” guide.[Model Context Protocol – Build an MCP server](https://modelcontextprotocol.io/docs/develop/build-server)

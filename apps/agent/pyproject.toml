@@ -1,0 +1,47 @@
+[project]
+name = "route-planner-agent"
+version = "0.1.0"
+description = "FastAPI and LangGraph-based agent for offline route planning"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  {name = "Route Planner"}
+]
+dependencies = [
+  "fastapi>=0.111.0,<1.0",
+  "uvicorn[standard]>=0.30.0,<1.0",
+  "langchain>=0.2.10,<0.3.0",
+  "langchain-community>=0.2.10,<0.3.0",
+  "langgraph>=0.0.58,<0.1.0",
+  "sqlmodel>=0.0.16,<0.1.0",
+  "pydantic>=2.7.0,<3.0.0",
+  "python-multipart>=0.0.9",
+  "aiofiles>=23.2.0",
+  "tenacity>=8.2.0",
+  "mcp>=1.2.0",
+  "loguru>=0.7.2",
+  "osmium>=3.6.0",
+  "shapely>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "httpx>=0.28.0",
+  "ruff>=0.6.9",
+  "black>=24.10.0"
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+

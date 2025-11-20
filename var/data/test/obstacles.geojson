@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "obstacle-1",
+        "type": "rockfall",
+        "buffer_m": 50
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-116.9955, 34.003],
+            [-116.9945, 34.003],
+            [-116.9945, 34.004],
+            [-116.9955, 34.004],
+            [-116.9955, 34.003]
+          ]
+        ]
+      }
+    }
+  ]
+}

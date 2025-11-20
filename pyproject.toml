@@ -1,35 +1,17 @@
-[project]
-name = "route-planner-mcp"
-version = "0.1.0"
-description = "Offline route planning service."
-readme = "README.md"
-requires-python = ">=3.10"
-license = {file = "LICENSE"}
-authors = [
-  {name = "Route Planner"}
-]
-dependencies = [
-  "numpy>=1.26,<2.0",
-  "shapely>=2.0,<2.1",
-  "mcp[cli]>=1.2.0"
-]
+[tool.black]
+line-length = 100
+target-version = ["py311"]
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "rich>=13.0"
-]
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["packages/route_planner_mcp", "apps/agent/src"]
 
-[project.scripts]
-route-planner-cli = "route_planner_mcp.cli:main"
-route-planner-mcp-server = "route_planner_mcp.server:main"
-route-planner-tool = "route_planner_mcp.tool_runner:main"
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501"]
 
-[build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-include = ["route_planner_mcp"]
-
-
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

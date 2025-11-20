@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: apps/agent/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./packages/route_planner_mcp/data:/app/packages/route_planner_mcp/data:ro
+    environment:
+      ROUTE_AGENT_DATA_ROOT: /app/packages/route_planner_mcp/data
+      ROUTE_AGENT_EXPORT_ROOT: /app/packages/route_planner_mcp/exports
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NEXT_PUBLIC_AGENT_URL: http://agent:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - agent

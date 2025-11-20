@@ -28,6 +28,13 @@ dist/
 .idea/
 .vscode/
 
+# Node / web build artifacts
+node_modules/
+pnpm-lock.yaml
+.next/
+apps/web/.next/
+apps/web/node_modules/
+
 # OS generated files
 .DS_Store
 Thumbs.db
@@ -38,7 +45,7 @@ coverage.xml
 *.log
 
 # Application exports & temporary artifacts
-exports/
+packages/route_planner_mcp/exports/
 
 # Specstory metadata
 .specstory/
